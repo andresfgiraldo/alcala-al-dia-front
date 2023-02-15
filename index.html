@@ -7,15 +7,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alcalá al día</title>
 
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
+        integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
         #apto {
-            font-size: 3em;
+            font-size: 2em;
             border: none;
             border-bottom: 1px solid;
-            width: 300px;
+            width: 250px;
+        }
+
+        #btn-search {
+            background-color: beige;
+            opacity: 0.7;
+            border: none;
         }
 
         #resultado-apto {
@@ -28,7 +41,7 @@
 
 
         html {
-            font-size: 24px;
+            font-size: 18px;
         }
 
         .success {
@@ -51,12 +64,15 @@
 
     <div class="container mt-3 text-center">
         <h2>Conjunto Residencial Alcalá</h2>
-        <h4>Autorización Zonas Comunes</h3>
+        <p>Autorización Zonas Comunes</h3>
     </div>
 
     <div class="container mt-5 text-center">
         <label for="apto" class="form-label">Apartamento:</label> <br>
         <input type="number" name="apto" id="apto" class="rounded-pill text-center">
+        <button id="btn-search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+        </button>
     </div>
     </div>
 
@@ -82,21 +98,14 @@
                 clean()
             });
 
+            $('#btn-search').click(function () {
+                search()
+            })
+
 
             $(document).on('keypress', async function (e) {
                 if (e.which == 13) {
-                    const apto = $('#apto').val()
-                    clean();
-
-                    $('#resultado-apto').html(apto);
-                    $('#apto').val('')
-
-                    respuesta = await findApto(apto)
-                    respuesta == true ? autorizado() : noAutorizado();
-
-                    myInterval = setInterval(function () {
-                        clean()
-                    }, 5000);
+                    search()
                 }
             });
 
@@ -150,9 +159,28 @@
 
 
             async function findApto(apto) {
-                const storage = JSON.parse(localStorage.getItem(var_local_storage));
-                const search = await storage.saldos.data.find((r) => r.apto == apto)
-                return search.autorizado == true || search.autorizado == 'true'
+                try {
+                    const storage = JSON.parse(localStorage.getItem(var_local_storage));
+                    const search = await storage.saldos.data.find((r) => r.apto == apto)
+                    return search.autorizado == true || search.autorizado == 'true'
+                } catch (error) {
+                    return false
+                }
+            }
+
+            async function search() {
+                const apto = $('#apto').val()
+                clean();
+
+                $('#resultado-apto').html(apto);
+                $('#apto').val('')
+
+                respuesta = await findApto(apto)
+                respuesta == true ? autorizado() : noAutorizado();
+
+                myInterval = setInterval(function () {
+                    clean()
+                }, 5000);
             }
 
 
